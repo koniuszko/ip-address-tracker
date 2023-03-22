@@ -18,7 +18,7 @@
     text-align: center;
 }
 
-h1{
+h1 {
     margin: 26px 0;
     font-size: 26px;
     font-weight: 500;
@@ -29,7 +29,7 @@ h1{
 
 form {
     width: 330px;
-       border-radius: 15px;
+    border-radius: 15px;
     background-color: #fff;
     overflow: hidden;
     cursor: pointer;
@@ -49,10 +49,10 @@ input::placeholder {
 }
 
 input:focus {
-    outline:none;
+    outline: none;
 }
 
-button{
+button {
     width: 58px;
     height: 58px;
     background-color: #000;
@@ -60,7 +60,7 @@ button{
     transition: .2s;
 }
 
-button:hover{
+button:hover {
     background-color: #3f3f3f;
 }
 
@@ -86,7 +86,7 @@ p {
     color: #969696;
 }
 
-h2{
+h2 {
     font-size: 20px;
     font-weight: 500;
     letter-spacing: -0.18px;
@@ -94,8 +94,72 @@ h2{
     margin-top: 6px;
 }
 
-.map   {
+.map {
     width: 100vw;
     height: calc(100vh - 300px);
     background-color: royalblue;
+}
+
+@media (min-width: 1440px) {
+    .banner {
+        height: 280px;
+    }
+
+    h1 {
+        margin: 32px 0;
+        font-size: 32px;
+        letter-spacing: -0.29px;
+    }
+
+    form {
+        width: 555px;
+    }
+
+    input {
+        width: calc(555px - 58px);
+    }
+
+
+    .container {
+
+        top: 200px;
+        width: 1110px;
+        height: 160px;
+        flex-direction: row;
+        gap: 0;
+        text-align: left;
+    }
+
+    .flex-item {
+        height: 60%;
+        flex-grow: 1;
+        padding: 0 32px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .border {
+        border-right: 2px solid #969696;
+    }
+
+    p {
+        font-size: 12px;
+        letter-spacing: 1.75px;
+    }
+
+    h2 {
+        font-size: 26px;
+        font-weight: 500;
+        letter-spacing: -0.18px;
+        line-height: 24px;
+        margin-top: 6px;
+    }
+
+    .map {
+        width: 100vw;
+        height: calc(100vh - 280px);
+        background-color: royalblue;
+    }
+
 }
