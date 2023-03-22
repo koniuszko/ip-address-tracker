@@ -9,7 +9,7 @@
 .banner {
     width: 100vw;
     height: 300px;
-    background-image: url('./images/pattern-bg.png');
+    background-image: url('/public/images/pattern-bg.png');
     background-size: cover;
     background-repeat: no-repeat;
     display: flex;
@@ -94,10 +94,9 @@ h2 {
     margin-top: 6px;
 }
 
-.map {
+#map {
     width: 100vw;
     height: calc(100vh - 300px);
-    background-color: royalblue;
 }
 
 @media (min-width: 1440px) {
@@ -156,10 +155,9 @@ h2 {
         margin-top: 6px;
     }
 
-    .map {
+    #map {
         width: 100vw;
-        height: calc(100vh - 280px);
-        background-color: royalblue;
+        height: 500px;
     }
 
 }
