@@ -1,6 +1,6 @@
 import './App.css'
 import arrowIcon from './images/icon-arrow.svg'
-import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet';
+import {MapContainer, TileLayer, Marker, Popup, useMap} from 'react-leaflet';
 import {Icon} from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import locIcon from './images/icon-location.svg'
@@ -18,12 +18,10 @@ function App() {
             city: "",
             region: "",
             timezone: "",
-            lat: 0,
-            lng: 0
         }
     });
 
-    const position = [ipData.location.lat, ipData.location.lng]
+    const [center, setCenter] = useState([0, 0]);
 
     // --- (6) Create a custom marker ---
     const customIcon = new Icon({
@@ -33,6 +31,14 @@ function App() {
         popupAnchor: [-0, 0]
     })
 
+    const Recenter = ({lat, lng}) => {
+        const map = useMap();
+        useEffect(() => {
+            map.setView([lat, lng]);
+        }, [lat, lng]);
+        return null;
+    }
+
 
     useEffect(() => {
         let myIp = "";
@@ -40,6 +46,7 @@ function App() {
         axios.get(`https://geo.ipify.org/api/v2/country,city,vpn?apiKey=at_bNOqPuYzkRFWBQ9skGpsQ88BwDwDm&ipAddress=${myIp}`)
             .then((response) => {
                 setIpData(response.data)
+                setCenter([response.data.location.lat, response.data.location.lng])
                 console.log(response.data)
             })
     }, []);
@@ -50,6 +57,7 @@ function App() {
         axios.get(`https://geo.ipify.org/api/v2/country,city,vpn?apiKey=at_bNOqPuYzkRFWBQ9skGpsQ88BwDwDm&ipAddress=${ipAddress}`)
             .then((response) => {
                 setIpData(response.data)
+                setCenter([response.data.location.lat, response.data.location.lng])
             }).catch(err => alert("IP Address seems to be wrong."))
     }
 
@@ -85,12 +93,13 @@ function App() {
             </header>
             <section className='map-component'>
                 <div id="map" className='map'>
-                    <MapContainer center={position} zoom={6} scrollWheelZoom={true}>
+                    <MapContainer center={center} zoom={9} scrollWheelZoom={true}>
                         <TileLayer
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
-                        <Marker position={position}
+                        <Recenter lat={center[0]} lng={center[1]}/>
+                        <Marker position={center}
                                 icon={customIcon}
                         >
                             <Popup>
