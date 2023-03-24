@@ -1,55 +1,106 @@
 import './App.css'
 import arrowIcon from './images/icon-arrow.svg'
-import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
+import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet';
+import {Icon} from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import locIcon from './images/icon-location.svg'
+import {useEffect, useState} from "react";
+import axios from "axios";
 
 
 function App() {
-    // const map = L.map('map', {
-    //     center: [51.505, -0.09],
-    //     zoom: 13
-    // });
+    const [ipAddress, setIpAddress] = useState('');
+    const [myIp, setMyIp] = useState('');
+    const [ipData, setIpData] = useState({
+        ip: "",
+        isp: "",
+        location: {
+            city: "",
+            region: "",
+            timezone: "",
+            lat: 0,
+            lng: 0
+        }
+    });
+
+    const position = [ipData.location.lat, ipData.location.lng]
+
+    // --- (6) Create a custom marker ---
+    const customIcon = new Icon({
+        iconUrl: locIcon,
+        iconSize: [25, 25],
+        iconAnchor: [1, 1],
+        popupAnchor: [-0, 0]
+    })
+
+
+    useEffect(() => {
+        let myIp = "";
+        axios.get('https://geolocation-db.com/json/').then((res) => myIp = res.data.IPv4)
+        axios.get(`https://geo.ipify.org/api/v2/country,city,vpn?apiKey=at_bNOqPuYzkRFWBQ9skGpsQ88BwDwDm&ipAddress=${myIp}`)
+            .then((response) => {
+                setIpData(response.data)
+                console.log(response.data)
+            })
+    }, []);
+
+
+    const ipCheck = (e) => {
+        e.preventDefault()
+        axios.get(`https://geo.ipify.org/api/v2/country,city,vpn?apiKey=at_bNOqPuYzkRFWBQ9skGpsQ88BwDwDm&ipAddress=${ipAddress}`)
+            .then((response) => {
+                setIpData(response.data)
+            }).catch(err => alert("IP Address seems to be wrong."))
+    }
+
     return (
         <div className="App">
             <header className="banner">
                 <h1>IP Address Tracker</h1>
                 <form>
-                    <input type="text" placeholder="Search for any IP Address or domain"/>
-                    <button>
+                    <input value={ipAddress} onChange={e => setIpAddress(e.target.value)} type="text"
+                           placeholder="Search for any IP Address or domain"/>
+                    <button onClick={e => ipCheck(e)}>
                         <img src={arrowIcon} alt="arrow-icon"/>
                     </button>
                 </form>
                 <div className="container">
                     <div className="border flex-item">
                         <p>ip address</p>
-                        <h2>192.212.174.101</h2>
+                        <h2>{ipData ? ipData.ip : ""}</h2>
                     </div>
                     <div className="border flex-item">
                         <p>location</p>
-                        <h2>Brooklyn, NY 10001</h2>
+                        <h2>{ipData ? `${ipData.location.city}, ${ipData.location.region}` : ""}</h2>
                     </div>
                     <div className="border flex-item">
                         <p>timezone</p>
-                        <h2>UTC -05:00</h2>
+                        <h2>UTC {ipData ? ipData.location.timezone : "00:00"}</h2>
                     </div>
                     <div className="flex-item">
                         <p>isp</p>
-                        <h2>SpaceX Starlink</h2>
+                        <h2>{ipData ? ipData.isp : ""}</h2>
                     </div>
                 </div>
             </header>
-            <div id="map">
-                <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false}>
-                    <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <Marker position={[51.505, -0.09]}>
-                        <Popup>
-                            A pretty CSS3 popup. <br/> Easily customizable.
-                        </Popup>
-                    </Marker>
-                </MapContainer>
-            </div>
+            <section className='map-component'>
+                <div id="map" className='map'>
+                    <MapContainer center={position} zoom={6} scrollWheelZoom={true}>
+                        <TileLayer
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
+                        <Marker position={position}
+                                icon={customIcon}
+                        >
+                            <Popup>
+                                IP Address
+                            </Popup>
+                        </Marker>
+                    </MapContainer>
+
+                </div>
+            </section>
         </div>
     )
 }
