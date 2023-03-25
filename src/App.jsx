@@ -53,7 +53,6 @@ function App() {
 
     const searchHandler = (e) => {
         e.preventDefault()
-
         if (validIpAddress.test(searchInput)) {
             axios.get(`https://geo.ipify.org/api/v2/country,city,vpn?apiKey=at_bNOqPuYzkRFWBQ9skGpsQ88BwDwDm&ipAddress=${searchInput}`)
                 .then((response) => {
