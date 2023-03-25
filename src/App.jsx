@@ -9,8 +9,8 @@ import axios from "axios";
 
 
 function App() {
-    const [ipAddress, setIpAddress] = useState('');
-    const [myIp, setMyIp] = useState('');
+    const [searchInput, setSearchInput] = useState('');
+    const [center, setCenter] = useState([0, 0]);
     const [ipData, setIpData] = useState({
         ip: "",
         isp: "",
@@ -21,15 +21,17 @@ function App() {
         }
     });
 
-    const [center, setCenter] = useState([0, 0]);
-
-    // --- (6) Create a custom marker ---
     const customIcon = new Icon({
         iconUrl: locIcon,
         iconSize: [25, 25],
-        iconAnchor: [1, 1],
+        iconAnchor: [0, 0],
         popupAnchor: [-0, 0]
     })
+
+    const validIpAddress = new RegExp(/^((?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])[.]){3}(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])$/
+    )
+
+    const validDomain = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$/)
 
     const Recenter = ({lat, lng}) => {
         const map = useMap();
@@ -39,7 +41,6 @@ function App() {
         return null;
     }
 
-
     useEffect(() => {
         let myIp = "";
         axios.get('https://geolocation-db.com/json/').then((res) => myIp = res.data.IPv4)
@@ -47,18 +48,28 @@ function App() {
             .then((response) => {
                 setIpData(response.data)
                 setCenter([response.data.location.lat, response.data.location.lng])
-                console.log(response.data)
             })
     }, []);
 
-
-    const ipCheck = (e) => {
+    const searchHandler = (e) => {
         e.preventDefault()
-        axios.get(`https://geo.ipify.org/api/v2/country,city,vpn?apiKey=at_bNOqPuYzkRFWBQ9skGpsQ88BwDwDm&ipAddress=${ipAddress}`)
-            .then((response) => {
-                setIpData(response.data)
-                setCenter([response.data.location.lat, response.data.location.lng])
-            }).catch(err => alert("IP Address seems to be wrong."))
+
+        if (validIpAddress.test(searchInput)) {
+            axios.get(`https://geo.ipify.org/api/v2/country,city,vpn?apiKey=at_bNOqPuYzkRFWBQ9skGpsQ88BwDwDm&ipAddress=${searchInput}`)
+                .then((response) => {
+                    setIpData(response.data)
+                    setCenter([response.data.location.lat, response.data.location.lng])
+                }).catch(err => alert("IP Address seems to be wrong."))
+        } else if (validDomain.test(searchInput)) {
+            axios.get(`https://geo.ipify.org/api/v2/country,city,vpn?apiKey=at_bNOqPuYzkRFWBQ9skGpsQ88BwDwDm&domain=${searchInput}`)
+                .then((response) => {
+                    setIpData(response.data)
+                    setCenter([response.data.location.lat, response.data.location.lng])
+                }).catch(err => alert("Domain seems to be wrong."))
+        } else {
+            alert("Wrong input!")
+        }
+
     }
 
     return (
@@ -66,9 +77,9 @@ function App() {
             <header className="banner">
                 <h1>IP Address Tracker</h1>
                 <form>
-                    <input value={ipAddress} onChange={e => setIpAddress(e.target.value)} type="text"
+                    <input value={searchInput} onChange={e => setSearchInput(e.target.value)} type="text"
                            placeholder="Search for any IP Address or domain"/>
-                    <button onClick={e => ipCheck(e)}>
+                    <button onClick={e => searchHandler(e)}>
                         <img src={arrowIcon} alt="arrow-icon"/>
                     </button>
                 </form>
@@ -103,11 +114,10 @@ function App() {
                                 icon={customIcon}
                         >
                             <Popup>
-                                IP Address
+                                IP Address location
                             </Popup>
                         </Marker>
                     </MapContainer>
-
                 </div>
             </section>
         </div>
